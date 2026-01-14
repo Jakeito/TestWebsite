@@ -62,9 +62,5 @@ func ValidateToken(tokenString, secret string) (*Claims, error) {
 		return nil, ErrInvalidToken
 	}
 
-	if time.Now().After(claims.ExpiresAt.Time) {
-		return nil, ErrExpiredToken
-	}
-
 	return claims, nil
 }

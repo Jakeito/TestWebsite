@@ -1,5 +1,12 @@
 version: '3.8'
 
+# IMPORTANT: This is for development only!
+# For production:
+# 1. Use Docker secrets or environment variables from a secure vault
+# 2. Change all default passwords and secrets
+# 3. Enable SSL/TLS for database connections
+# 4. Use proper certificate management
+
 services:
   db:
     image: postgres:15-alpine
@@ -30,10 +37,11 @@ services:
       DB_PASSWORD: changeme
       DB_NAME: testwebsite_db
       DB_SSLMODE: disable
-      JWT_SECRET: your-production-secret-change-this
+      # WARNING: Change this secret in production!
+      JWT_SECRET: ${JWT_SECRET:-your-production-secret-change-this}
       SERVER_PORT: 8080
-      ADMIN_EMAIL: admin@example.com
-      ADMIN_PASSWORD: changeme
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
     depends_on:
       db:
         condition: service_healthy
