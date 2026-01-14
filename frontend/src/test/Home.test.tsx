@@ -21,9 +21,9 @@ describe('Home Page', () => {
       </BrowserRouter>
     );
     
-    expect(screen.getByText(/About Me/i)).toBeInTheDocument();
-    expect(screen.getByText(/Resume/i)).toBeInTheDocument();
-    expect(screen.getByText(/Car Build/i)).toBeInTheDocument();
-    expect(screen.getByText(/Contact/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /About Me/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Resume/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Car Build/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Contact/i })).toBeInTheDocument();
   });
 });
