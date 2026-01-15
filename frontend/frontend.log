@@ -1,0 +1,54 @@
+nohup: ignoring input
+
+> frontend@1.0.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 140 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+10:26:21 AM [vite] hmr update /src/pages/Resume.tsx
+10:26:21 AM [vite] hmr update /src/pages/About.tsx
+10:26:21 AM [vite] hmr update /src/pages/CarBuild.tsx
+10:26:21 AM [vite] hmr update /src/pages/Admin.tsx
+11:42:10 AM [vite] hmr update /src/pages/About.tsx
+11:42:10 AM [vite] hmr update /src/pages/CarBuild.tsx
+11:42:10 AM [vite] hmr update /src/pages/Resume.tsx
+11:42:10 AM [vite] hmr update /src/styles/App.css
+1:13:31 PM [vite] hmr update /src/pages/About.tsx
+1:13:31 PM [vite] hmr update /src/pages/Home.tsx
+1:14:08 PM [vite] hmr update /src/pages/Resume.tsx
+1:14:59 PM [vite] hmr update /src/pages/CarBuild.tsx
+1:25:34 PM [vite] hmr update /src/pages/About.tsx
+1:25:34 PM [vite] hmr update /src/pages/Resume.tsx
+1:25:34 PM [vite] hmr update /src/pages/CarBuild.tsx
+1:25:34 PM [vite] hmr update /src/pages/Admin.tsx
+1:25:34 PM [vite] hmr update /src/styles/App.css
+1:25:34 PM [vite] hmr update /src/pages/Home.tsx
+1:26:18 PM [vite] hmr update /src/pages/CarBuild.tsx
+2:39:52 PM [vite] hmr update /src/pages/CarBuild.tsx
+2:39:52 PM [vite] hmr update /src/pages/About.tsx
+2:41:22 PM [vite] hmr update /src/components/ImageGallery.tsx
+2:41:27 PM [vite] hmr update /src/components/ImageGallery.tsx
+2:41:32 PM [vite] hmr update /src/components/ImageGallery.tsx
+2:41:42 PM [vite] hmr update /src/components/ImageGallery.tsx
+2:41:46 PM [vite] hmr update /src/components/ImageGallery.tsx
+2:45:50 PM [vite] hmr update /src/components/ImageGallery.tsx
+2:46:04 PM [vite] hmr update /src/pages/About.tsx
+2:46:04 PM [vite] hmr update /src/pages/CarBuild.tsx
+2:46:04 PM [vite] hmr update /src/pages/Home.tsx
+2:46:12 PM [vite] hmr update /src/pages/Home.tsx
+6:36:42 PM [vite] hmr update /src/pages/Home.tsx
+6:36:42 PM [vite] hmr update /src/pages/About.tsx
+6:36:42 PM [vite] hmr update /src/pages/CarBuild.tsx
+6:36:42 PM [vite] hmr update /src/components/ImageGallery.tsx
+6:36:42 PM [vite] hmr update /src/components/ImageCarousel.tsx
+6:42:57 PM [vite] hmr update /src/components/ImageCarousel.tsx
+6:42:57 PM [vite] hmr update /src/components/ImageGallery.tsx
+6:45:47 PM [vite] hmr update /src/components/ImageCarousel.tsx
+6:45:47 PM [vite] hmr update /src/components/ImageGallery.tsx
+6:46:24 PM [vite] hmr update /src/components/ImageCarousel.tsx
+6:46:24 PM [vite] hmr update /src/components/ImageGallery.tsx
+6:48:22 PM [vite] hmr update /src/components/ImageCarousel.tsx
+6:48:22 PM [vite] hmr update /src/components/ImageGallery.tsx
