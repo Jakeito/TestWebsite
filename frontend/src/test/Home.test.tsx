@@ -26,9 +26,9 @@ describe('Home Page', () => {
       </CarouselProvider>
     );
     
-    expect(screen.getByText(/About Me/i)).toBeInTheDocument();
-    expect(screen.getByText(/Resume/i)).toBeInTheDocument();
-    expect(screen.getByText(/GR86 Build/i)).toBeInTheDocument();
-    expect(screen.getByText(/Contact/i)).toBeInTheDocument();
+    expect(screen.getByText(/👨‍💻 About Me/i)).toBeInTheDocument();
+    expect(screen.getByText(/📄 Resume/i)).toBeInTheDocument();
+    expect(screen.getByText(/🚗 GR86 Build/i)).toBeInTheDocument();
+    expect(screen.getByText(/📧 Contact/i)).toBeInTheDocument();
   });
 });
