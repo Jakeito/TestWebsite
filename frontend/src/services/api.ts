@@ -80,11 +80,7 @@ export const galleryService = {
       formData.append('images', file);
     });
     formData.append('folder', folder);
-    return api.post('/gallery/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    return api.post('/gallery/upload', formData);
   },
   list: (folder: string) => api.get(`/gallery/images?folder=${folder}`),
   delete: (id: number) => api.delete(`/gallery/image/${id}`),
