@@ -98,7 +98,7 @@ func main() {
 
 	// Apply CORS middleware
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173", "https://testwebsite-hark.onrender.com"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173", "https://testwebsite-hark.onrender.com", "https://test-website-five-mu.vercel.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
