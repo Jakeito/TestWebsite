@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS gallery_images (
 );
 
 -- Create indexes
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_resume_sections_type ON resume_sections(section_type);
-CREATE INDEX idx_car_build_category ON car_build_entries(category);
-CREATE INDEX idx_contact_submissions_created ON contact_submissions(created_at DESC);
-CREATE INDEX idx_gallery_images_folder ON gallery_images(folder);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_resume_sections_type ON resume_sections(section_type);
+CREATE INDEX IF NOT EXISTS idx_car_build_category ON car_build_entries(category);
+CREATE INDEX IF NOT EXISTS idx_contact_submissions_created ON contact_submissions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_gallery_images_folder ON gallery_images(folder);
