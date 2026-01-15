@@ -26,11 +26,16 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Determine base images directory
-	baseDir := "./public/images"
-
-	// Read the images directory
-	imagesPath := filepath.Join(baseDir, folder)
+	// Get the directory where the executable is running from
+	ex, err := os.Executable()
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode([]string{})
+		return
+	}
+	
+	appDir := filepath.Dir(ex)
+	imagesPath := filepath.Join(appDir, "public", "images", folder)
 	files, err := os.ReadDir(imagesPath)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
