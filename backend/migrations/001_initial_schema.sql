@@ -58,8 +58,20 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Images stored in database
+CREATE TABLE IF NOT EXISTS gallery_images (
+    id SERIAL PRIMARY KEY,
+    folder VARCHAR(50) NOT NULL, -- gallery, about, carbuild, hero
+    filename VARCHAR(255) NOT NULL,
+    image_data BYTEA NOT NULL,
+    content_type VARCHAR(50) DEFAULT 'image/jpeg',
+    display_order INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_resume_sections_type ON resume_sections(section_type);
 CREATE INDEX idx_car_build_category ON car_build_entries(category);
 CREATE INDEX idx_contact_submissions_created ON contact_submissions(created_at DESC);
+CREATE INDEX idx_gallery_images_folder ON gallery_images(folder);

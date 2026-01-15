@@ -3,8 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"os"
-	"path/filepath"
 )
 
 func GetImages(w http.ResponseWriter, r *http.Request) {
@@ -15,7 +13,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		folder = "gallery"
 	}
 
-	// Validate folder name to prevent directory traversal
+	// Validate folder name to prevent injection
 	allowedFolders := map[string]bool{
 		"gallery":  true,
 		"about":    true,
@@ -28,56 +26,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Try multiple possible paths for the images directory
-	possiblePaths := []string{
-		"./public/images",           // relative to backend
-		"../backend/public/images",  // relative to repo root
-		"public/images",             // current directory
-	}
-
-	var imagesPath string
-	for _, path := range possiblePaths {
-		fullPath := filepath.Join(path, folder)
-		if _, err := os.Stat(fullPath); err == nil {
-			imagesPath = fullPath
-			break
-		}
-	}
-
-	// If no path found, return empty array
-	if imagesPath == "" {
-		json.NewEncoder(w).Encode([]string{})
-		return
-	}
-	files, err := os.ReadDir(imagesPath)
-	if err != nil {
-		json.NewEncoder(w).Encode([]string{})
-		return
-	}
-
-	var images []string
-	validExtensions := map[string]bool{
-		".jpg":  true,
-		".jpeg": true,
-		".png":  true,
-		".webp": true,
-		".gif":  true,
-		".JPG":  true,
-		".JPEG": true,
-		".PNG":  true,
-		".WEBP": true,
-		".GIF":  true,
-	}
-
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		}
-		ext := filepath.Ext(file.Name())
-		if validExtensions[ext] {
-			images = append(images, "/public/images/"+folder+"/"+file.Name())
-		}
-	}
-
-	json.NewEncoder(w).Encode(images)
+	// For now, return empty array
+	// Images will be stored in database and can be uploaded via admin panel
+	json.NewEncoder(w).Encode([]string{})
 }
