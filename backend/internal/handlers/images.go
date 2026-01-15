@@ -26,16 +26,28 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the directory where the executable is running from
-	ex, err := os.Executable()
-	if err != nil {
+	// Try multiple possible paths for the images directory
+	possiblePaths := []string{
+		"./public/images",           // relative to backend
+		"../backend/public/images",  // relative to repo root
+		"public/images",             // current directory
+	}
+
+	var imagesPath string
+	for _, path := range possiblePaths {
+		fullPath := filepath.Join(path, folder)
+		if _, err := os.Stat(fullPath); err == nil {
+			imagesPath = fullPath
+			break
+		}
+	}
+
+	// If no path found, return empty array
+	if imagesPath == "" {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode([]string{})
 		return
 	}
-	
-	appDir := filepath.Dir(ex)
-	imagesPath := filepath.Join(appDir, "public", "images", folder)
 	files, err := os.ReadDir(imagesPath)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
