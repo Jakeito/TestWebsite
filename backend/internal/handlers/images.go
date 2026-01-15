@@ -8,6 +8,8 @@ import (
 )
 
 func GetImages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	
 	folder := r.URL.Query().Get("folder")
 	if folder == "" {
 		folder = "gallery"
@@ -22,7 +24,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !allowedFolders[folder] {
-		http.Error(w, "Invalid folder", http.StatusBadRequest)
+		json.NewEncoder(w).Encode([]string{})
 		return
 	}
 
@@ -44,13 +46,11 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 
 	// If no path found, return empty array
 	if imagesPath == "" {
-		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode([]string{})
 		return
 	}
 	files, err := os.ReadDir(imagesPath)
 	if err != nil {
-		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode([]string{})
 		return
 	}
@@ -79,6 +79,5 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(images)
 }
