@@ -70,6 +70,7 @@ export const carBuildService = {
 export const contactService = {
   submit: (data: any) => api.post('/contact', data),
   getAll: () => api.get('/contact'),
+  delete: (id: number) => api.delete(`/contact/${id}`),
 };
 
 export default api;

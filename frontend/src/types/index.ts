@@ -42,11 +42,17 @@ export interface CarBuildEntry {
   updated_at: string;
 }
 
-export interface ContactSubmission {
+export interface ContactSubmissionForm {
   name: string;
   email: string;
   subject?: string;
   message: string;
+}
+
+export interface ContactSubmission extends ContactSubmissionForm {
+  id: number;
+  is_read: boolean;
+  created_at: string;
 }
 
 export interface LoginRequest {

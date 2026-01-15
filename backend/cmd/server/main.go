@@ -54,6 +54,7 @@ func main() {
 	r.HandleFunc("/api/resume", resumeHandler.GetResumeSections).Methods("GET")
 	r.HandleFunc("/api/carbuild", carBuildHandler.GetCarBuildEntries).Methods("GET")
 	r.HandleFunc("/api/contact", contactHandler.SubmitContact).Methods("POST")
+	r.HandleFunc("/api/images", handlers.GetImages).Methods("GET")
 
 	// Protected routes (require authentication)
 	authRouter := r.PathPrefix("/api").Subrouter()
@@ -80,6 +81,7 @@ func main() {
 
 	// Admin routes for contact submissions
 	adminRouter.HandleFunc("/contact", contactHandler.GetContactSubmissions).Methods("GET")
+	adminRouter.HandleFunc("/contact/{id}", contactHandler.DeleteContactSubmission).Methods("DELETE")
 
 	// Admin routes for user management
 	adminRouter.HandleFunc("/users", authHandler.CreateUser).Methods("POST")

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { contactService } from '../services/api';
-import type { ContactSubmission } from '../types';
+import type { ContactSubmissionForm } from '../types';
+import ImageCarousel from '../components/ImageCarousel';
 
 export default function Contact() {
-  const [formData, setFormData] = useState<ContactSubmission>({
+  const [formData, setFormData] = useState<ContactSubmissionForm>({
     name: '',
     email: '',
     subject: '',
@@ -44,14 +45,15 @@ export default function Contact() {
   };
 
   return (
-    <div className="page">
-      <div className="container">
-        <div className="page-header">
-          <h1>Contact Me</h1>
-          <p>Let's get in touch</p>
-        </div>
+    <ImageCarousel folder="gallery" interval={5000}>
+      <div className="page">
+        <div className="container">
+          <div className="page-header">
+            <h1>Contact Me</h1>
+            <p>Let's get in touch</p>
+          </div>
 
-        <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
+          <div className="card" style={{ maxWidth: '600px', margin: '0 auto', background: 'rgba(26, 26, 26, 0.95)', backdropFilter: 'blur(10px)' }}>
           <h2>Send Me a Message</h2>
           
           {success && (
@@ -114,8 +116,9 @@ export default function Contact() {
               {loading ? 'Sending...' : 'Send Message'}
             </button>
           </form>
+          </div>
         </div>
       </div>
-    </div>
+    </ImageCarousel>
   );
 }
