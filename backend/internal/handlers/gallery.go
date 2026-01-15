@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -74,7 +75,8 @@ func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	).Scan(&id)
 
 	if err != nil {
-		http.Error(w, "Error saving image", http.StatusInternalServerError)
+		log.Printf("Error inserting image into database: %v", err)
+		http.Error(w, fmt.Sprintf("Error saving image: %v", err), http.StatusInternalServerError)
 		return
 	}
 
