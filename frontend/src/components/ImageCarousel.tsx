@@ -44,26 +44,14 @@ export default function ImageCarousel({ folder, interval = 5000, children }: Ima
     }
   };
 
-  if (images.length === 0) {
-    return (
-      <div 
-        className="card"
-        style={{ 
-          textAlign: 'center',
-          padding: '3rem',
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
-          borderColor: '#dc2626'
-        }}
-      >
-        <p style={{ color: '#a3a3a3', fontSize: '1.1rem' }}>
-          📸 Drop images into <code style={{ color: '#dc2626', background: '#262626', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>frontend/public/images/{folder}/</code> to see them here
-        </p>
-      </div>
-    );
-  }
-
-  // Background carousel mode
+  // If children exist, render them regardless of images
   if (children) {
+    // If no images, just render children without carousel background
+    if (images.length === 0) {
+      return <>{children}</>;
+    }
+
+    // Background carousel mode with images
     return (
       <div
         style={{

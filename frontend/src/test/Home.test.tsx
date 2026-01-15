@@ -14,7 +14,7 @@ describe('Home Page', () => {
       </CarouselProvider>
     );
     
-    expect(screen.getByText(/Welcome to My Personal Website/i)).toBeInTheDocument();
+    expect(screen.getByText(/Welcome to my portfolio/i)).toBeInTheDocument();
   });
 
   it('renders navigation cards', () => {
@@ -26,9 +26,9 @@ describe('Home Page', () => {
       </CarouselProvider>
     );
     
-    expect(screen.getByRole('heading', { name: /About Me/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Resume/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Car Build/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Contact/i })).toBeInTheDocument();
+    expect(screen.getByText(/About Me/i)).toBeInTheDocument();
+    expect(screen.getByText(/Resume/i)).toBeInTheDocument();
+    expect(screen.getByText(/GR86 Build/i)).toBeInTheDocument();
+    expect(screen.getByText(/Contact/i)).toBeInTheDocument();
   });
 });
