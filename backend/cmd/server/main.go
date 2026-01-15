@@ -108,6 +108,21 @@ func main() {
 	adminRouter.HandleFunc("/gallery/upload", galleryHandler.UploadImage).Methods("POST")
 	adminRouter.HandleFunc("/gallery/images", galleryHandler.ListImages).Methods("GET")
 	adminRouter.HandleFunc("/gallery/image/{id}", galleryHandler.DeleteImage).Methods("DELETE")
+	adminRouter.HandleFunc("/gallery/reseed", func(w http.ResponseWriter, r *http.Request) {
+		// Clear existing images
+		_, err := db.Exec("DELETE FROM gallery_images")
+		if err != nil {
+			http.Error(w, "Failed to clear images", http.StatusInternalServerError)
+			return
+		}
+		// Reseed
+		if err := db.SeedGalleryImages(); err != nil {
+			http.Error(w, "Failed to seed images", http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"Images reseeded successfully"}`))
+	}).Methods("POST")
 
 	// Apply CORS middleware
 	c := cors.New(cors.Options{

@@ -23,8 +23,29 @@ func (db *DB) SeedGalleryImages() error {
 		return nil
 	}
 
+	// Try multiple possible base directories
+	possiblePaths := []string{
+		"./public/images",
+		"./backend/public/images",
+		"/app/public/images",
+	}
+
+	var baseDir string
+	for _, path := range possiblePaths {
+		info, err := os.Stat(path)
+		if err == nil && info.IsDir() {
+			baseDir = path
+			log.Printf("Found images directory at: %s", baseDir)
+			break
+		}
+	}
+
+	if baseDir == "" {
+		log.Println("Could not find public/images directory in any expected location")
+		return nil
+	}
+
 	folders := []string{"gallery", "about", "carbuild", "hero"}
-	baseDir := "./public/images"
 
 	for _, folder := range folders {
 		folderPath := filepath.Join(baseDir, folder)
@@ -49,6 +70,8 @@ func (db *DB) SeedGalleryImages() error {
 			log.Printf("Error reading folder %s: %v", folderPath, err)
 			continue
 		}
+
+		log.Printf("Processing folder %s with %d files", folder, len(files))
 
 		for _, file := range files {
 			if file.IsDir() {
