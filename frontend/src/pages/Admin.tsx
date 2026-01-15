@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import ImageCarousel from '../components/ImageCarousel';
-import { aboutService, resumeService, carBuildService, contactService } from '../services/api';
+import { aboutService, resumeService, carBuildService, contactService, galleryService } from '../services/api';
 import type { AboutContent, ResumeSection, CarBuildEntry, ContactSubmission } from '../types';
 
 export default function Admin() {
-  const [activeTab, setActiveTab] = useState<'about' | 'resume' | 'carbuild' | 'contact'>('about');
+  const [activeTab, setActiveTab] = useState<'about' | 'resume' | 'carbuild' | 'contact' | 'images'>('about');
   const [aboutItems, setAboutItems] = useState<AboutContent[]>([]);
   const [resumeItems, setResumeItems] = useState<ResumeSection[]>([]);
   const [carBuildItems, setCarBuildItems] = useState<CarBuildEntry[]>([]);
   const [contactItems, setContactItems] = useState<ContactSubmission[]>([]);
+  const [galleryImages, setGalleryImages] = useState<any[]>([]);
+  const [selectedFolder, setSelectedFolder] = useState('gallery');
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadMessage, setUploadMessage] = useState('');
 
   // About form state
   const [aboutForm, setAboutForm] = useState({ title: '', content: '', image_url: '' });
@@ -40,7 +44,7 @@ export default function Admin() {
 
   useEffect(() => {
     loadData();
-  }, [activeTab]);
+  }, [activeTab, selectedFolder]);
 
   const loadData = async () => {
     try {
@@ -56,6 +60,9 @@ export default function Admin() {
       } else if (activeTab === 'contact') {
         const response = await contactService.getAll();
         setContactItems(response.data || []);
+      } else if (activeTab === 'images') {
+        const response = await galleryService.list(selectedFolder);
+        setGalleryImages(response.data || []);
       }
     } catch (err) {
       console.error('Error loading data:', err);
@@ -225,6 +232,51 @@ export default function Admin() {
     }
   };
 
+  // Gallery handlers
+  const handleImageUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!uploadFile) {
+      setUploadMessage('Please select a file');
+      return;
+    }
+
+    try {
+      await galleryService.upload(uploadFile, selectedFolder);
+      setUploadMessage('Image uploaded successfully!');
+      setUploadFile(null);
+      const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+      loadData();
+      setTimeout(() => setUploadMessage(''), 3000);
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      setUploadMessage('Error uploading image');
+    }
+  };
+
+  const handleImageDelete = async (imageUrl: string) => {
+    // Extract ID from URL like "/api/image/123"
+    const match = imageUrl.match(/\/api\/image\/(\d+)/);
+    if (!match) return;
+    
+    const id = parseInt(match[1]);
+    if (confirm('Are you sure you want to delete this image?')) {
+      try {
+        await galleryService.delete(id);
+        loadData();
+      } catch (err) {
+        console.error('Error deleting image:', err);
+      }
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setUploadFile(e.target.files[0]);
+      setUploadMessage('');
+    }
+  };
+
   return (
     <ImageCarousel folder="gallery" interval={5000}>
       <div className="page">
@@ -236,7 +288,7 @@ export default function Admin() {
 
           {/* Tab Navigation */}
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '2px solid #262626', paddingBottom: '1rem' }}>
-            {(['about', 'resume', 'carbuild', 'contact'] as const).map((tab) => (
+            {(['about', 'resume', 'carbuild', 'contact', 'images'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -615,6 +667,130 @@ export default function Admin() {
                   </div>
                 ))
               )}
+            </div>
+          )}
+
+          {/* Images Tab */}
+          {activeTab === 'images' && (
+            <div>
+              <div style={{ marginBottom: '2rem' }}>
+                <h3 style={{ color: '#fff', marginBottom: '1rem' }}>Upload Images</h3>
+                
+                {/* Folder Selector */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label htmlFor="folder-select" style={{ color: '#d4d4d4', marginBottom: '0.5rem', display: 'block' }}>
+                    Select Folder:
+                  </label>
+                  <select
+                    id="folder-select"
+                    value={selectedFolder}
+                    onChange={(e) => setSelectedFolder(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      background: '#171717',
+                      border: '1px solid #262626',
+                      borderRadius: '4px',
+                      color: '#fff',
+                      fontSize: '1rem',
+                    }}
+                  >
+                    <option value="gallery">Gallery</option>
+                    <option value="about">About</option>
+                    <option value="carbuild">Car Build</option>
+                    <option value="hero">Hero</option>
+                  </select>
+                </div>
+
+                {/* Upload Form */}
+                <form onSubmit={handleImageUpload} className="card" style={{ background: 'rgba(26, 26, 26, 0.95)', backdropFilter: 'blur(10px)' }}>
+                  <div className="form-group">
+                    <label htmlFor="imageUpload">Choose Image</label>
+                    <input
+                      type="file"
+                      id="imageUpload"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        background: '#171717',
+                        border: '1px solid #262626',
+                        borderRadius: '4px',
+                        color: '#fff',
+                      }}
+                    />
+                  </div>
+                  {uploadFile && (
+                    <p style={{ color: '#a3a3a3', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                      Selected: {uploadFile.name} ({(uploadFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </p>
+                  )}
+                  <button type="submit" style={{ marginTop: '1rem', width: '100%' }}>
+                    Upload to {selectedFolder}
+                  </button>
+                  {uploadMessage && (
+                    <p style={{
+                      marginTop: '1rem',
+                      padding: '0.75rem',
+                      background: uploadMessage.includes('Error') ? '#dc2626' : '#16a34a',
+                      borderRadius: '4px',
+                      color: '#fff',
+                    }}>
+                      {uploadMessage}
+                    </p>
+                  )}
+                </form>
+              </div>
+
+              {/* Image Gallery */}
+              <div>
+                <h3 style={{ color: '#fff', marginBottom: '1rem' }}>
+                  Images in {selectedFolder} ({galleryImages.length})
+                </h3>
+                {galleryImages.length === 0 ? (
+                  <div className="card" style={{ background: 'rgba(26, 26, 26, 0.95)', backdropFilter: 'blur(10px)' }}>
+                    <p style={{ color: '#a3a3a3' }}>No images uploaded yet. Upload your first image above.</p>
+                  </div>
+                ) : (
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                    gap: '1rem',
+                  }}>
+                    {galleryImages.map((imageUrl, index) => (
+                      <div
+                        key={index}
+                        className="card"
+                        style={{
+                          background: 'rgba(26, 26, 26, 0.95)',
+                          backdropFilter: 'blur(10px)',
+                          padding: '0.5rem',
+                        }}
+                      >
+                        <img
+                          src={`${import.meta.env.VITE_API_URL || ''}${imageUrl}`}
+                          alt={`Gallery image ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '150px',
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                            marginBottom: '0.5rem',
+                          }}
+                        />
+                        <button
+                          onClick={() => handleImageDelete(imageUrl)}
+                          className="danger"
+                          style={{ width: '100%', padding: '0.5rem', fontSize: '0.9rem' }}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

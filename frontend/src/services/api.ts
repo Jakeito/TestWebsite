@@ -73,4 +73,19 @@ export const contactService = {
   delete: (id: number) => api.delete(`/contact/${id}`),
 };
 
+export const galleryService = {
+  upload: (file: File, folder: string) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('folder', folder);
+    return api.post('/gallery/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  list: (folder: string) => api.get(`/gallery/images?folder=${folder}`),
+  delete: (id: number) => api.delete(`/gallery/image/${id}`),
+};
+
 export default api;
