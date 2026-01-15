@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -23,9 +24,13 @@ func NewGalleryHandler(db *database.DB) *GalleryHandler {
 
 // UploadImage handles image upload to database
 func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
+	// Set response header early
+	w.Header().Set("Content-Type", "application/json")
+
 	// Parse multipart form (max 100MB total)
 	if err := r.ParseMultipartForm(100 << 20); err != nil {
-		http.Error(w, "Files too large", http.StatusBadRequest)
+		log.Printf("Error parsing multipart form: %v", err)
+		http.Error(w, fmt.Sprintf("Files too large or invalid: %v", err), http.StatusBadRequest)
 		return
 	}
 
@@ -33,6 +38,8 @@ func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	if folder == "" {
 		folder = "gallery"
 	}
+
+	log.Printf("Upload request for folder: %s", folder)
 
 	// Validate folder
 	allowedFolders := map[string]bool{
@@ -43,22 +50,35 @@ func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !allowedFolders[folder] {
+		log.Printf("Invalid folder: %s", folder)
 		http.Error(w, "Invalid folder", http.StatusBadRequest)
 		return
 	}
 
-	// Handle multiple files
-	files := r.MultipartForm.File["images"]
-	if len(files) == 0 {
+	// Handle multiple files - try both "images" and "image" field names
+	var fileHeaders []*multipart.FileHeader
+	
+	// First try "images" field (plural)
+	if r.MultipartForm.File["images"] != nil {
+		fileHeaders = r.MultipartForm.File["images"]
+	} else if r.MultipartForm.File["image"] != nil {
+		// Fallback to "image" field (singular)
+		fileHeaders = r.MultipartForm.File["image"]
+	}
+
+	if len(fileHeaders) == 0 {
+		log.Printf("No files found in request. Available fields: %v", r.MultipartForm.File)
 		http.Error(w, "No files provided", http.StatusBadRequest)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	log.Printf("Processing %d files for folder %s", len(fileHeaders), folder)
 
 	var uploadedImages []map[string]interface{}
 
-	for _, fileHeader := range files {
+	for _, fileHeader := range fileHeaders {
+		log.Printf("Processing file: %s (size: %d)", fileHeader.Filename, fileHeader.Size)
+
 		file, err := fileHeader.Open()
 		if err != nil {
 			log.Printf("Error opening file %s: %v", fileHeader.Filename, err)
@@ -79,6 +99,8 @@ func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 			contentType = "image/jpeg"
 		}
 
+		log.Printf("Inserting file %s with content type %s", fileHeader.Filename, contentType)
+
 		// Insert into database
 		var id int
 		err = h.db.QueryRow(
@@ -90,6 +112,8 @@ func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error inserting image %s into database: %v", fileHeader.Filename, err)
 			continue
 		}
+
+		log.Printf("Successfully uploaded file %s with ID %d", fileHeader.Filename, id)
 
 		uploadedImages = append(uploadedImages, map[string]interface{}{
 			"id":       id,
