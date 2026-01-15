@@ -33,6 +33,11 @@ func main() {
 		log.Fatalf("Failed to run migrations: %v", err)
 	}
 
+	// Seed gallery images from public/images directory
+	if err := db.SeedGalleryImages(); err != nil {
+		log.Printf("Warning: Failed to seed gallery images: %v", err)
+	}
+
 	// Create admin user if it doesn't exist
 	if err := createAdminUser(db, cfg); err != nil {
 		log.Printf("Warning: Failed to create admin user: %v", err)
