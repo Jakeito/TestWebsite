@@ -2,13 +2,16 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect } from 'vitest';
 import Home from '../pages/Home';
+import { CarouselProvider } from '../context/CarouselContext';
 
 describe('Home Page', () => {
   it('renders welcome message', () => {
     render(
-      <BrowserRouter>
-        <Home />
-      </BrowserRouter>
+      <CarouselProvider>
+        <BrowserRouter>
+          <Home />
+        </BrowserRouter>
+      </CarouselProvider>
     );
     
     expect(screen.getByText(/Welcome to My Personal Website/i)).toBeInTheDocument();
@@ -16,9 +19,11 @@ describe('Home Page', () => {
 
   it('renders navigation cards', () => {
     render(
-      <BrowserRouter>
-        <Home />
-      </BrowserRouter>
+      <CarouselProvider>
+        <BrowserRouter>
+          <Home />
+        </BrowserRouter>
+      </CarouselProvider>
     );
     
     expect(screen.getByRole('heading', { name: /About Me/i })).toBeInTheDocument();

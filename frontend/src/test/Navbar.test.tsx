@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import Navbar from '../components/Navbar';
+import { CarouselProvider } from '../context/CarouselContext';
 
 // Mock the auth service
 vi.mock('../services/api', () => ({
@@ -15,9 +16,11 @@ vi.mock('../services/api', () => ({
 describe('Navbar Component', () => {
   it('renders navigation links', () => {
     render(
-      <BrowserRouter>
-        <Navbar />
-      </BrowserRouter>
+      <CarouselProvider>
+        <BrowserRouter>
+          <Navbar />
+        </BrowserRouter>
+      </CarouselProvider>
     );
     
     expect(screen.getByText('My Portfolio')).toBeInTheDocument();
@@ -30,9 +33,11 @@ describe('Navbar Component', () => {
 
   it('renders login link when not authenticated', () => {
     render(
-      <BrowserRouter>
-        <Navbar />
-      </BrowserRouter>
+      <CarouselProvider>
+        <BrowserRouter>
+          <Navbar />
+        </BrowserRouter>
+      </CarouselProvider>
     );
     
     expect(screen.getByText('Login')).toBeInTheDocument();
