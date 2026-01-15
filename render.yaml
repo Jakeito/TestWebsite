@@ -3,7 +3,8 @@ services:
     name: testwebsite-backend
     runtime: go
     plan: free
-    buildCommand: cd backend && go build -o server cmd/server/main.go
+    rootDir: backend
+    buildCommand: go build -o server cmd/server/main.go
     startCommand: ./server
     envVars:
       - key: POSTGRES_USER
@@ -47,8 +48,9 @@ services:
       - key: IMAGES_DIR
         value: /images
 
-  - type: pserv
-    name: testwebsite-db
-    ipAllowList: []
+databases:
+  - name: testwebsite-db
+    databaseName: testwebsite_db
+    user: testwebsite
     plan: free
-    postgresMajorVersion: "15"
+    ipAllowList: []
