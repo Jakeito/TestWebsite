@@ -48,6 +48,13 @@ func main() {
 	// Setup router
 	r := mux.NewRouter()
 
+	// Health check / root endpoint
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok","message":"TestWebsite Backend API"}`))
+	}).Methods("GET")
+
 	// Public routes
 	r.HandleFunc("/api/login", authHandler.Login).Methods("POST")
 	r.HandleFunc("/api/about", aboutHandler.GetAboutContent).Methods("GET")
@@ -88,7 +95,7 @@ func main() {
 
 	// Apply CORS middleware
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173"},
+		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173", "https://testwebsite-hark.onrender.com"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
