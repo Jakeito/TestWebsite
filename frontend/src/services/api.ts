@@ -74,9 +74,11 @@ export const contactService = {
 };
 
 export const galleryService = {
-  upload: (file: File, folder: string) => {
+  upload: (files: File[], folder: string) => {
     const formData = new FormData();
-    formData.append('image', file);
+    files.forEach((file) => {
+      formData.append('images', file);
+    });
     formData.append('folder', folder);
     return api.post('/gallery/upload', formData, {
       headers: {

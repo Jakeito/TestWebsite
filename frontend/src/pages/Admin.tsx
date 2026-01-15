@@ -11,7 +11,7 @@ export default function Admin() {
   const [contactItems, setContactItems] = useState<ContactSubmission[]>([]);
   const [galleryImages, setGalleryImages] = useState<any[]>([]);
   const [selectedFolder, setSelectedFolder] = useState('gallery');
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [uploadMessage, setUploadMessage] = useState('');
 
   // About form state
@@ -235,22 +235,22 @@ export default function Admin() {
   // Gallery handlers
   const handleImageUpload = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!uploadFile) {
-      setUploadMessage('Please select a file');
+    if (uploadFiles.length === 0) {
+      setUploadMessage('Please select at least one file');
       return;
     }
 
     try {
-      await galleryService.upload(uploadFile, selectedFolder);
-      setUploadMessage('Image uploaded successfully!');
-      setUploadFile(null);
+      await galleryService.upload(uploadFiles, selectedFolder);
+      setUploadMessage(`Successfully uploaded ${uploadFiles.length} image(s)!`);
+      setUploadFiles([]);
       const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
       loadData();
       setTimeout(() => setUploadMessage(''), 3000);
     } catch (err) {
-      console.error('Error uploading image:', err);
-      setUploadMessage('Error uploading image');
+      console.error('Error uploading images:', err);
+      setUploadMessage('Error uploading images');
     }
   };
 
@@ -271,8 +271,8 @@ export default function Admin() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadFile(e.target.files[0]);
+    if (e.target.files) {
+      setUploadFiles(Array.from(e.target.files));
       setUploadMessage('');
     }
   };
@@ -705,11 +705,12 @@ export default function Admin() {
                 {/* Upload Form */}
                 <form onSubmit={handleImageUpload} className="card" style={{ background: 'rgba(26, 26, 26, 0.95)', backdropFilter: 'blur(10px)' }}>
                   <div className="form-group">
-                    <label htmlFor="imageUpload">Choose Image</label>
+                    <label htmlFor="imageUpload">Choose Images (select multiple)</label>
                     <input
                       type="file"
                       id="imageUpload"
                       accept="image/*"
+                      multiple
                       onChange={handleFileChange}
                       style={{
                         width: '100%',
@@ -721,13 +722,20 @@ export default function Admin() {
                       }}
                     />
                   </div>
-                  {uploadFile && (
-                    <p style={{ color: '#a3a3a3', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                      Selected: {uploadFile.name} ({(uploadFile.size / 1024 / 1024).toFixed(2)} MB)
-                    </p>
+                  {uploadFiles.length > 0 && (
+                    <div style={{ color: '#a3a3a3', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: '1rem' }}>
+                      <p style={{ marginBottom: '0.5rem' }}>Selected {uploadFiles.length} file(s):</p>
+                      <ul style={{ marginLeft: '1rem' }}>
+                        {Array.from(uploadFiles).map((file, idx) => (
+                          <li key={idx}>
+                            {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                   <button type="submit" style={{ marginTop: '1rem', width: '100%' }}>
-                    Upload to {selectedFolder}
+                    Upload {uploadFiles.length > 0 ? uploadFiles.length : ''} to {selectedFolder}
                   </button>
                   {uploadMessage && (
                     <p style={{

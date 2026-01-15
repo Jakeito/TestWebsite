@@ -23,18 +23,11 @@ func NewGalleryHandler(db *database.DB) *GalleryHandler {
 
 // UploadImage handles image upload to database
 func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
-	// Parse multipart form (max 10MB)
-	if err := r.ParseMultipartForm(10 << 20); err != nil {
-		http.Error(w, "File too large", http.StatusBadRequest)
+	// Parse multipart form (max 100MB total)
+	if err := r.ParseMultipartForm(100 << 20); err != nil {
+		http.Error(w, "Files too large", http.StatusBadRequest)
 		return
 	}
-
-	file, header, err := r.FormFile("image")
-	if err != nil {
-		http.Error(w, "Invalid file", http.StatusBadRequest)
-		return
-	}
-	defer file.Close()
 
 	folder := r.FormValue("folder")
 	if folder == "" {
@@ -54,40 +47,64 @@ func (h *GalleryHandler) UploadImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Read file data
-	fileData, err := io.ReadAll(file)
-	if err != nil {
-		http.Error(w, "Error reading file", http.StatusInternalServerError)
-		return
-	}
-
-	// Get content type
-	contentType := header.Header.Get("Content-Type")
-	if contentType == "" {
-		contentType = "image/jpeg"
-	}
-
-	// Insert into database
-	var id int
-	err = h.db.QueryRow(
-		"INSERT INTO gallery_images (folder, filename, image_data, content_type) VALUES ($1, $2, $3, $4) RETURNING id",
-		folder, header.Filename, fileData, contentType,
-	).Scan(&id)
-
-	if err != nil {
-		log.Printf("Error inserting image into database: %v", err)
-		http.Error(w, fmt.Sprintf("Error saving image: %v", err), http.StatusInternalServerError)
+	// Handle multiple files
+	files := r.MultipartForm.File["images"]
+	if len(files) == 0 {
+		http.Error(w, "No files provided", http.StatusBadRequest)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+
+	var uploadedImages []map[string]interface{}
+
+	for _, fileHeader := range files {
+		file, err := fileHeader.Open()
+		if err != nil {
+			log.Printf("Error opening file %s: %v", fileHeader.Filename, err)
+			continue
+		}
+		defer file.Close()
+
+		// Read file data
+		fileData, err := io.ReadAll(file)
+		if err != nil {
+			log.Printf("Error reading file %s: %v", fileHeader.Filename, err)
+			continue
+		}
+
+		// Get content type
+		contentType := fileHeader.Header.Get("Content-Type")
+		if contentType == "" {
+			contentType = "image/jpeg"
+		}
+
+		// Insert into database
+		var id int
+		err = h.db.QueryRow(
+			"INSERT INTO gallery_images (folder, filename, image_data, content_type) VALUES ($1, $2, $3, $4) RETURNING id",
+			folder, fileHeader.Filename, fileData, contentType,
+		).Scan(&id)
+
+		if err != nil {
+			log.Printf("Error inserting image %s into database: %v", fileHeader.Filename, err)
+			continue
+		}
+
+		uploadedImages = append(uploadedImages, map[string]interface{}{
+			"id":       id,
+			"filename": fileHeader.Filename,
+			"folder":   folder,
+			"url":      fmt.Sprintf("/api/image/%d", id),
+		})
+	}
+
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id":       id,
-		"filename": header.Filename,
-		"folder":   folder,
-		"url":      fmt.Sprintf("/api/image/%d", id),
+		"uploaded": len(uploadedImages),
+		"images":   uploadedImages,
 	})
 }
+
 
 // GetImage serves an image by ID
 func (h *GalleryHandler) GetImage(w http.ResponseWriter, r *http.Request) {
