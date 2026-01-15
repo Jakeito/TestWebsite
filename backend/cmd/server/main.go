@@ -44,6 +44,8 @@ func main() {
 	resumeHandler := handlers.NewResumeHandler(db)
 	carBuildHandler := handlers.NewCarBuildHandler(db)
 	contactHandler := handlers.NewContactHandler(db)
+	imageHandler := handlers.NewImageHandler(db)
+	galleryHandler := handlers.NewGalleryHandler(db)
 
 	// Setup router
 	r := mux.NewRouter()
@@ -64,7 +66,8 @@ func main() {
 	r.HandleFunc("/api/resume", resumeHandler.GetResumeSections).Methods("GET")
 	r.HandleFunc("/api/carbuild", carBuildHandler.GetCarBuildEntries).Methods("GET")
 	r.HandleFunc("/api/contact", contactHandler.SubmitContact).Methods("POST")
-	r.HandleFunc("/api/images", handlers.GetImages).Methods("GET")
+	r.HandleFunc("/api/images", imageHandler.GetImages).Methods("GET")
+	r.HandleFunc("/api/image/{id}", galleryHandler.GetImage).Methods("GET")
 
 	// Protected routes (require authentication)
 	authRouter := r.PathPrefix("/api").Subrouter()
@@ -95,6 +98,11 @@ func main() {
 
 	// Admin routes for user management
 	adminRouter.HandleFunc("/users", authHandler.CreateUser).Methods("POST")
+
+	// Admin routes for gallery images
+	adminRouter.HandleFunc("/gallery/upload", galleryHandler.UploadImage).Methods("POST")
+	adminRouter.HandleFunc("/gallery/images", galleryHandler.ListImages).Methods("GET")
+	adminRouter.HandleFunc("/gallery/image/{id}", galleryHandler.DeleteImage).Methods("DELETE")
 
 	// Apply CORS middleware
 	c := cors.New(cors.Options{
