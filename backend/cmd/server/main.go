@@ -48,6 +48,9 @@ func main() {
 	// Setup router
 	r := mux.NewRouter()
 
+	// Serve static files from public directory
+	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir("./public"))))
+
 	// Health check / root endpoint
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

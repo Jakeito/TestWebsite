@@ -44,7 +44,7 @@ services:
       - key: ADMIN_EMAIL
         value: admin@example.com
       - key: ADMIN_PASSWORD
-        generateValue: true
+        value: "changeme"
       - key: IMAGES_DIR
         value: /images
 

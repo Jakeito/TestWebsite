@@ -26,11 +26,8 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Determine base images directory (env override for containers)
-	baseDir := os.Getenv("IMAGES_DIR")
-	if baseDir == "" {
-		baseDir = "../frontend/public/images"
-	}
+	// Determine base images directory
+	baseDir := "./public/images"
 
 	// Read the images directory
 	imagesPath := filepath.Join(baseDir, folder)
@@ -61,7 +58,7 @@ func GetImages(w http.ResponseWriter, r *http.Request) {
 		}
 		ext := filepath.Ext(file.Name())
 		if validExtensions[ext] {
-			images = append(images, "/images/"+folder+"/"+file.Name())
+			images = append(images, "/public/images/"+folder+"/"+file.Name())
 		}
 	}
 
