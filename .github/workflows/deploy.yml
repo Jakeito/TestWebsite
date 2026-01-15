@@ -1,8 +1,8 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages (Disabled - Using Render)
 
 on:
   push:
-    branches: [main]
+    branches: [disabled-branch]
 
 jobs:
   deploy:
