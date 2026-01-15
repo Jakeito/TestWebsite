@@ -20,7 +20,7 @@ services:
       - key: POSTGRES_PORT
         value: "5432"
       - key: POSTGRES_DB
-        value: testwebsite_db
+        value: testwebsite_db_lwks
       - key: DB_HOST
         fromDatabase:
           name: testwebsite-db
@@ -34,7 +34,7 @@ services:
           name: testwebsite-db
           property: password
       - key: DB_NAME
-        value: testwebsite_db
+        value: testwebsite_db_lwks
       - key: DB_SSLMODE
         value: "require"
       - key: JWT_SECRET
